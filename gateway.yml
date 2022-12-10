@@ -3,21 +3,31 @@ server:
 
 spring:
   application:
-    name: ms-gateway
+    name: gateway
   cloud:    
     gateway:      
       discovery:
         locator:
           enabled: true
       routes:
-        - id: catalogms
+        - id: catalogs
           uri: lb://api-catalog
           predicates:
             - Path=/api/v1/catalog/**
-        - id: moviems
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: api-catalog
+                fallbackUri: forward:/fallback/catalog
+        - id: movies
           uri: lb://api-movie
           predicates:
             - Path=/api/v1/movies/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: api-movie
+                fallbackUri: forward:/fallback/movies
 
 info:
   app:
@@ -37,3 +47,9 @@ management:
       web:
         exposure:
             include: gateway
+
+queue:
+  movie:
+    name: MovieQueue
+  
+
