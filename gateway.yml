@@ -9,6 +9,7 @@ spring:
       discovery:
         locator:
           enabled: true
+          
       routes:
         - id: catalogs
           uri: lb://api-catalog
@@ -28,6 +29,15 @@ spring:
               args:
                 name: api-movie
                 fallbackUri: forward:/fallback/movies
+        - id: series
+          uri: lb://api-serie
+          predicates:
+            - Path=/api/v1/series/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: api-serie
+                fallbackUri: forward:/fallback/series
 
 info:
   app:
@@ -39,6 +49,7 @@ eureka:
       fetchRegistry: true
       serviceURL:
         defaultZone: http://localhost:8761/eureka
+        
 management:
   endpoint:
       gateway:
@@ -48,8 +59,5 @@ management:
         exposure:
             include: gateway
 
-queue:
-  movie:
-    name: MovieQueue
   
 
