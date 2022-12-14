@@ -13,6 +13,29 @@ eureka:
       defaultZone: http://localhost:8761/eureka
   instance:
     instance-id: ${spring.application.name}:${random.int}
+    
+resilience4j.retry:
+  instances:
+    retryCatalog:
+      maxAttempts: 3
+      waitDuration: 10s
+      enableExponentialBackoff: true
+      exponentialBackoffMultiplier: 2
+      retryExceptions:
+        - org.springframework.web.client.HttpServerErrorException
+        - java.io.IOException
+
+resilience4j.circuitbreaker:
+  instances:
+    clientCatalog:
+      registerHealthIndicator: true
+      slidingWindowSize: 10
+      permittedNumberOfCallsInHalfOpenState: 3
+      slidingWindowType: TIME_BASED
+      minimumNumberOfCalls: 20
+      waitDurationInOpenState: 50s
+      failureRateThreshold: 50
+      eventConsumerBufferSize: 10
 
 management:
   endpoints:
@@ -26,4 +49,4 @@ management:
 info:
   app:
     name: api-catalog
-    description: Movies Catalog
+    description: Movies and Series Catalog
